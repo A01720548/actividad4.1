@@ -49,35 +49,35 @@ void Graph::addEdge(string u, string v) {
 
     if (pu == this->vertices.end() && pv == this->vertices.end()) {
         //if they dont exist, add them
-        Vertex* U = new Vertex(u);
-        Vertex* V = new Vertex(v);
-        U->addConnection(V);
-        V->addConnection(U);
+        auto U = make_shared<Vertex>(u);
+        auto V = make_shared<Vertex>(v);
+        U->addConnection(*V);
+        V->addConnection(*U);
         this->vertices.push_back(*U);
         this->vertices.push_back(*V);
     }
     else if (pv == this->vertices.end()) {
         // only pu exists, add V and find U
-        Vertex* U = &this->vertices[pu - this->vertices.begin()];
-        Vertex* V = new Vertex(v);
-        U->addConnection(V);
-        V->addConnection(U);
+        Vertex* U = &(*pu);
+        auto V = make_shared<Vertex>(v);
+        U->addConnection(*V);
+        V->addConnection(*U);
         this->vertices.push_back(*V);
     }
     else if (pu == this->vertices.end()) {
         // only pv exists, add U and find V
-        Vertex* U = new Vertex(u);
-        Vertex* V = &this->vertices[pv - this->vertices.begin()];
-        U->addConnection(V);
-        V->addConnection(U);
-        this->vertices.push_back(*U);
+        Vertex* V = &(*pv);
+        auto U = make_shared<Vertex>(u);
+        U->addConnection(*V);
+        V->addConnection(*U);
+        this->vertices.push_back(*V);
     }
     else {
         // both exist, find them
-        Vertex* U = &this->vertices[pu - this->vertices.begin()];
-        Vertex* V = &this->vertices[pv - this->vertices.begin()];
-        U->addConnection(V);
-        V->addConnection(U);
+        Vertex* V = &(*pv);
+        Vertex* U = &(*pu);
+        U->addConnection(*V);
+        V->addConnection(*U);
     }
 
 }
@@ -85,7 +85,7 @@ void Graph::addEdge(string u, string v) {
 void Graph::printGraph() {
     vector<Vertex>::iterator it;
     for (it = this->vertices.begin(); it != this->vertices.end(); it++) {
-        auto current = this->vertices[it - this->vertices.begin()];
+        Vertex current = *it;
         cout << current.getName() << " has the following connections [";
         current.printNeighborhood();
         cout << "]" << endl;

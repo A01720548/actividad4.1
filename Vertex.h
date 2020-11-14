@@ -14,6 +14,7 @@ private:
 public:
     Vertex(string name = "");
     vector<shared_ptr<Vertex>> connections;
+    bool visited;
 
     string getName() { return this->label; }
     void addConnection(Vertex who);
@@ -25,6 +26,7 @@ public:
 Vertex::Vertex(string name)
 {
     this->label = name;
+    visited = false;
 }
 
 void Vertex::addConnection(Vertex who)

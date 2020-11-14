@@ -12,11 +12,13 @@ private:
     /* data */
     vector<Vertex> vertices;
 
+
 public:
     Graph(vector<string> vertices);
     void addEdge(string u, string v);
     int getSize() { return this->vertices.size(); }
     void printGraph();
+    bool DFS(Vertex* start);
 
 };
 /**
@@ -91,6 +93,17 @@ void Graph::printGraph() {
         cout << "]" << endl;
     }
 }
+
+bool Graph::DFS(Vertex* start)
+{
+    start->visited = true;
+    vector<shared_ptr<Vertex>>::iterator it;
+    for (it = start->connections.begin(); it != start->connections.end(); it++) {
+        DFS(&*it);
+    }
+    // start.connections
+}
+
 
 
 

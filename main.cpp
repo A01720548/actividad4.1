@@ -6,21 +6,17 @@
 using namespace std;
 
 main() {
-    vector<string> V = { "A", "B", "C" };
+    vector<string> V = { "A", "B", "C", "D", "E" };
 
     Graph graph = Graph(V);
 
     graph.addEdge("A", "B");
     graph.addEdge("B", "C");
     graph.addEdge("C", "A");
-    graph.addEdge("C", "A");
-    graph.addEdge("D", "C");
-    graph.addEdge("D", "E");
-    graph.addEdge("E", "F");
+    graph.addEdge("C", "D");
+    graph.addEdge("E", "D");
+
 
     graph.printGraph();
-
-    graph.addEdge("E", "G");
-
-    graph.printGraph();
+    graph.DFSWrapper("D");
 }

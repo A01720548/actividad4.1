@@ -1,3 +1,13 @@
+/**
+ * @file Vertex.h
+ * @author Esteban de la Maza, Ricardo Jasso, Raul Jerlach
+ * @brief Vertex of graph
+ * @version 0.1
+ * @date 2020-11-15
+ *
+ * @copyright Copyright (c) 2020
+ *
+ */
 #include <string>
 #include <vector>
 #include <iostream>

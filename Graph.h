@@ -1,3 +1,13 @@
+/**
+ * @file Graph.h
+ * @author Esteban de la Maza, Ricardo Jasso, Raul Jerlach
+ * @brief Graph class with DFS, BFS, isTree and isBipartite
+ * @version 0.1
+ * @date 2020-11-15
+ *
+ * @copyright Copyright (c) 2020
+ *
+ */
 #include <vector>
 #include <string>
 #include "Vertex.h"
@@ -14,7 +24,7 @@ private:
     void DFS(Vertex* start, vector<Vertex*> visited);
     void BFS(Vertex* start, vector<Vertex*> visited);
     bool isCycle(Vertex* node, vector<Vertex*>& visited, Vertex* parent);
-    bool isBipartite(Vertex* node, vector<Vertex*>& visited, vector<Vertex*>& rojo, vector<Vertex*>& azul);
+    bool isBipartite(Vertex* node, vector<Vertex*>& visited, vector<Vertex*>& red, vector<Vertex*>& blue);
 
 
 
@@ -139,7 +149,13 @@ void Graph::BFSWrapper(string x)
     vector<Vertex*> visited;
     BFS(X, visited);
 }
-
+/**
+ * @brief Wrapper function to call cyclic function
+ * Complexity: O(1)
+ * @param x String of start node
+ * @return true If graph is tree
+ * @return false If graph isnt tree
+ */
 bool Graph::isTree(string x)
 {
     vector<Vertex>::iterator px;
@@ -158,15 +174,21 @@ bool Graph::isTree(string x)
 
     return true;
 }
-
+/**
+ * @brief Wrapper function to call recursive Bipartite Function
+ * Complexity: O(1)
+ * @param x String of start node
+ * @return true If graph is bipartite
+ * @return false If graph isnt bipartite
+ */
 bool Graph::isBipartiteWrapper(string x)
 {
     vector<Vertex>::iterator px;
     px = find(this->vertices.begin(), this->vertices.end(), x);
     Vertex* X = &this->vertices[px - this->vertices.begin()];
-    vector<Vertex*> visited, rojo, azul;
-    rojo.push_back(X);
-    if (isBipartite(X, visited, rojo, azul)) {
+    vector<Vertex*> visited, red, blue;
+    red.push_back(X);
+    if (isBipartite(X, visited, red, blue)) {
         return true;
     }
     else {
@@ -174,38 +196,55 @@ bool Graph::isBipartiteWrapper(string x)
     }
 
 }
-
-bool Graph::isBipartite(Vertex* node, vector<Vertex*>& visited, vector<Vertex*>& rojo, vector<Vertex*>& azul)
+/**
+ * @brief Recursive function to tell if graph is bipartite
+ * Complexity: O(n)
+ * @param node Current node
+ * @param visited Vector of past nodes that have been visited
+ * @param red Vector of nodes with red color
+ * @param blue Vector of nodes with blue color
+ * @return true If graph is bipartite
+ * @return false If graph isnt bipartite
+ */
+bool Graph::isBipartite(Vertex* node, vector<Vertex*>& visited, vector<Vertex*>& red, vector<Vertex*>& blue)
 {
     visited.push_back(node);
     vector<Vertex*>::iterator it, itRojo, itAzul;
-    itRojo = std::find(rojo.begin(), rojo.end(), node);
-    itAzul = std::find(azul.begin(), azul.end(), node);
+    itRojo = std::find(red.begin(), red.end(), node);
+    itAzul = std::find(blue.begin(), blue.end(), node);
     for (it = node->connections.begin(); it != node->connections.end();++it) {
         vector<Vertex*>::iterator it2;
         it2 = std::find(visited.begin(), visited.end(), (*it));
         if (it2 == visited.end()) {
-            if (itRojo != rojo.end()) {
-                azul.push_back((*it));
-                if (!isBipartite((*it), visited, rojo, azul)) {
+            if (itRojo != red.end()) {
+                blue.push_back((*it));
+                if (!isBipartite((*it), visited, red, blue)) {
                     return false;
                 }
             }
-            else if (itAzul != azul.end()) {
-                rojo.push_back((*it));
-                if (!isBipartite((*it), visited, rojo, azul)) {
+            else if (itAzul != blue.end()) {
+                red.push_back((*it));
+                if (!isBipartite((*it), visited, red, blue)) {
                     return false;
                 }
             }
         }
-        else if (itRojo != rojo.end() && itAzul != azul.end()) {
+        else if (itRojo != red.end() && itAzul != blue.end()) {
             return false;
         }
     }
     return true;
 }
 
-
+/**
+ * @brief Recursive function to tell if a graph is a cycle
+* Complexity: O(n)
+ * @param node Current node
+ * @param visited Vector of past nodes that have been visited
+ * @param parent Parent of current node
+ * @return true If graph is a cycle
+ * @return false If graph isnt a cycle
+ */
 bool Graph::isCycle(Vertex* node, vector<Vertex*>& visited, Vertex* parent)
 {
     visited.push_back(node);

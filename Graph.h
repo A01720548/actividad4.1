@@ -13,6 +13,10 @@ private:
     vector<Vertex> vertices;
     void DFS(Vertex* start, vector<Vertex*> visited);
     void BFS(Vertex* start, vector<Vertex*> visited);
+    bool isCycle(Vertex* node, vector<Vertex*>& visited, Vertex* parent);
+    bool isBipartite(Vertex* node, vector<Vertex*>& visited, vector<Vertex*>& rojo, vector<Vertex*>& azul);
+
+
 
 public:
     Graph(vector<string> vertices);
@@ -22,6 +26,8 @@ public:
     void DFSWrapper(string x);
     void BFSWrapper(string x);
 
+    bool isTree(string x);
+    bool isBipartiteWrapper(string x);
 };
 
 /**
@@ -87,6 +93,11 @@ void Graph::addEdge(string u, string v) {
 
 }
 
+/**
+ * @brief Prints the graph
+ *
+ * Complexity: O(n)
+ */
 void Graph::printGraph() {
     vector<Vertex>::iterator it;
 
@@ -98,6 +109,12 @@ void Graph::printGraph() {
     }
 }
 
+/**
+ * @brief Wrapper function that calls the main DFS function
+ *        and creates the vector to keep track of visited nodes
+ *
+ * @param x string for starting point for the DFS
+ */
 void Graph::DFSWrapper(string x)
 {
     vector<Vertex>::iterator px;
@@ -108,6 +125,12 @@ void Graph::DFSWrapper(string x)
 
 }
 
+/**
+ * @brief Wrapper function that calls the main BFS function
+ *        and creates the vector to keep track of visited nodes
+ *
+ * @param x string for starting point for the BFS
+ */
 void Graph::BFSWrapper(string x)
 {
     vector<Vertex>::iterator px;
@@ -117,8 +140,101 @@ void Graph::BFSWrapper(string x)
     BFS(X, visited);
 }
 
+bool Graph::isTree(string x)
+{
+    vector<Vertex>::iterator px;
+    px = find(this->vertices.begin(), this->vertices.end(), x);
+    Vertex* X = &this->vertices[px - this->vertices.begin()];
+    vector<Vertex*> visited;
+    Vertex* parent = new Vertex();
+
+    if (isCycle(X, visited, parent)) {
+        return false;
+    }
+
+    if (visited.size() < getSize()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Graph::isBipartiteWrapper(string x)
+{
+    vector<Vertex>::iterator px;
+    px = find(this->vertices.begin(), this->vertices.end(), x);
+    Vertex* X = &this->vertices[px - this->vertices.begin()];
+    vector<Vertex*> visited, rojo, azul;
+    rojo.push_back(X);
+    if (isBipartite(X, visited, rojo, azul)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+
+}
+
+bool Graph::isBipartite(Vertex* node, vector<Vertex*>& visited, vector<Vertex*>& rojo, vector<Vertex*>& azul)
+{
+    visited.push_back(node);
+    vector<Vertex*>::iterator it, itRojo, itAzul;
+    itRojo = std::find(rojo.begin(), rojo.end(), node);
+    itAzul = std::find(azul.begin(), azul.end(), node);
+    for (it = node->connections.begin(); it != node->connections.end();++it) {
+        vector<Vertex*>::iterator it2;
+        it2 = std::find(visited.begin(), visited.end(), (*it));
+        if (it2 == visited.end()) {
+            if (itRojo != rojo.end()) {
+                azul.push_back((*it));
+                if (!isBipartite((*it), visited, rojo, azul)) {
+                    return false;
+                }
+            }
+            else if (itAzul != azul.end()) {
+                rojo.push_back((*it));
+                if (!isBipartite((*it), visited, rojo, azul)) {
+                    return false;
+                }
+            }
+        }
+        else if (itRojo != rojo.end() && itAzul != azul.end()) {
+            return false;
+        }
+    }
+    return true;
+}
 
 
+bool Graph::isCycle(Vertex* node, vector<Vertex*>& visited, Vertex* parent)
+{
+    visited.push_back(node);
+
+    vector<Vertex*>::iterator it;
+    for (it = node->connections.begin(); it != node->connections.end();++it) {
+        vector<Vertex*>::iterator it2;
+        it2 = std::find(visited.begin(), visited.end(), (*it));
+        if (it2 == visited.end()) {
+            if (isCycle(*it, visited, node)) {
+                return true;
+            }
+        }
+        else if (*it != parent) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/**
+ * @brief Function for Depth First Search
+ *
+ * @param start value that indicates the starting node in the graph
+ * @param visited vector of vertex type pointers to keep track of visited nodes
+ *
+ *  * Complexity: O(n)
+ */
 void Graph::DFS(Vertex* start, vector<Vertex*> visited)
 {
     visited.push_back(start);
@@ -135,9 +251,16 @@ void Graph::DFS(Vertex* start, vector<Vertex*> visited)
         }
 
     }
-
 }
 
+/**
+ * @brief Funcion for Breadth First Search
+ *
+ * @param start value that indicates the starting node in the graph
+ * @param visited vector of vertex type pointers to keep track of visited nodes
+ *
+ * Complexity: O(n)
+ */
 void Graph::BFS(Vertex* start, vector<Vertex*> visited)
 {
     visited.push_back(start);
@@ -160,5 +283,4 @@ void Graph::BFS(Vertex* start, vector<Vertex*> visited)
         }
 
     }
-
 }
